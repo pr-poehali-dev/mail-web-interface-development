@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import Login from './Login';
+import Register from './Register';
 import { mailApi, type EmailCredentials } from '@/lib/mailApi';
 import { useToast } from '@/hooks/use-toast';
 
@@ -92,6 +93,7 @@ const folders = [
 
 const Index = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [credentials, setCredentials] = useState<EmailCredentials | null>(null);
   const [selectedFolder, setSelectedFolder] = useState('inbox');
   const [emails, setEmails] = useState<Email[]>(mockEmails);
@@ -153,7 +155,15 @@ const Index = () => {
   };
 
   if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
+    if (showRegister) {
+      return (
+        <Register
+          onRegisterSuccess={() => setShowRegister(false)}
+          onBackToLogin={() => setShowRegister(false)}
+        />
+      );
+    }
+    return <Login onLogin={handleLogin} onRegister={() => setShowRegister(true)} />;
   }
 
   return (
