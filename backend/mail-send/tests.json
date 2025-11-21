@@ -1,0 +1,38 @@
+{
+  "tests": [
+    {
+      "name": "Test send email",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Email": "test@nargizamail.ru",
+        "X-User-Password": "test123"
+      },
+      "body": {
+        "to": "recipient@example.com",
+        "subject": "Test Email",
+        "content": "This is a test email"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test missing fields",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Email": "test@nargizamail.ru",
+        "X-User-Password": "test123"
+      },
+      "body": {},
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

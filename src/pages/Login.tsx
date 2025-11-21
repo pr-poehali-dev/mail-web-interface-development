@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { mailApi } from '@/lib/mailApi';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,15 +16,29 @@ const Login = ({ onLogin }: LoginProps) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    setTimeout(() => {
+    const result = await mailApi.authenticate({ email, password });
+    
+    if (result.success) {
+      toast({
+        title: 'Успешный вход',
+        description: 'Вы успешно авторизовались'
+      });
       onLogin({ email, password });
-      setIsLoading(false);
-    }, 1000);
+    } else {
+      toast({
+        title: 'Ошибка авторизации',
+        description: result.error || 'Неверный email или пароль',
+        variant: 'destructive'
+      });
+    }
+    
+    setIsLoading(false);
   };
 
   return (

@@ -1,0 +1,29 @@
+{
+  "tests": [
+    {
+      "name": "Test authentication with valid credentials",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "email": "test@nargizamail.ru",
+        "password": "test123"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test missing credentials",
+      "method": "POST",
+      "path": "/",
+      "body": {},
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

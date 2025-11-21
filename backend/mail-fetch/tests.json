@@ -1,0 +1,29 @@
+{
+  "tests": [
+    {
+      "name": "Test fetch emails from inbox",
+      "method": "GET",
+      "path": "/?folder=inbox&limit=10",
+      "headers": {
+        "X-User-Email": "test@nargizamail.ru",
+        "X-User-Password": "test123"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "emails": []
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test missing authentication",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

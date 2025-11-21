@@ -6,6 +6,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import Login from './Login';
+import { mailApi, type EmailCredentials } from '@/lib/mailApi';
+import { useToast } from '@/hooks/use-toast';
 
 interface Email {
   id: number;
@@ -90,24 +92,63 @@ const folders = [
 
 const Index = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [credentials, setCredentials] = useState<EmailCredentials | null>(null);
   const [selectedFolder, setSelectedFolder] = useState('inbox');
-  const [selectedEmail, setSelectedEmail] = useState<Email | null>(mockEmails[0]);
+  const [emails, setEmails] = useState<Email[]>(mockEmails);
+  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoadingEmails, setIsLoadingEmails] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const authToken = localStorage.getItem('nargizamail_auth');
     if (authToken) {
-      setIsAuthenticated(true);
+      try {
+        const creds = JSON.parse(authToken);
+        setCredentials(creds);
+        setIsAuthenticated(true);
+      } catch (e) {
+        localStorage.removeItem('nargizamail_auth');
+      }
     }
   }, []);
 
-  const handleLogin = (credentials: { email: string; password: string }) => {
-    localStorage.setItem('nargizamail_auth', JSON.stringify(credentials));
+  useEffect(() => {
+    if (isAuthenticated && credentials) {
+      loadEmails();
+    }
+  }, [selectedFolder, isAuthenticated, credentials]);
+
+  const loadEmails = async () => {
+    if (!credentials) return;
+    
+    setIsLoadingEmails(true);
+    const result = await mailApi.fetchEmails(credentials, selectedFolder);
+    
+    if (result.success && result.emails) {
+      setEmails(result.emails);
+      if (result.emails.length > 0) {
+        setSelectedEmail(result.emails[0]);
+      }
+    } else {
+      toast({
+        title: 'Ошибка загрузки',
+        description: result.error || 'Не удалось загрузить письма',
+        variant: 'destructive'
+      });
+    }
+    setIsLoadingEmails(false);
+  };
+
+  const handleLogin = (loginCredentials: { email: string; password: string }) => {
+    localStorage.setItem('nargizamail_auth', JSON.stringify(loginCredentials));
+    setCredentials(loginCredentials);
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('nargizamail_auth');
+    setCredentials(null);
     setIsAuthenticated(false);
   };
 
@@ -199,8 +240,13 @@ const Index = () => {
         </div>
 
         <ScrollArea className="flex-1">
+          {isLoadingEmails ? (
+            <div className="flex items-center justify-center p-8">
+              <Icon name="Loader2" className="animate-spin text-purple-500" size={32} />
+            </div>
+          ) : (
           <div className="divide-y divide-purple-100">
-            {mockEmails.map((email) => (
+            {emails.map((email) => (
               <button
                 key={email.id}
                 onClick={() => setSelectedEmail(email)}
@@ -231,6 +277,7 @@ const Index = () => {
               </button>
             ))}
           </div>
+          )}
         </ScrollArea>
       </div>
 
