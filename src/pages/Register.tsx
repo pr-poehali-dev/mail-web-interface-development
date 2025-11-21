@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { mailApi } from '@/lib/mailApi';
 
 interface RegisterProps {
   onRegisterSuccess: () => void;
@@ -43,14 +44,25 @@ const Register = ({ onRegisterSuccess, onBackToLogin }: RegisterProps) => {
 
     setIsLoading(true);
 
-    setTimeout(() => {
+    const result = await mailApi.register({ email, password, fullName });
+
+    if (result.success) {
       toast({
         title: 'Регистрация завершена!',
         description: `Ваш почтовый ящик ${email} успешно создан`
       });
-      setIsLoading(false);
-      onRegisterSuccess();
-    }, 2000);
+      setTimeout(() => {
+        onRegisterSuccess();
+      }, 1500);
+    } else {
+      toast({
+        title: 'Ошибка регистрации',
+        description: result.error || 'Не удалось создать аккаунт',
+        variant: 'destructive'
+      });
+    }
+
+    setIsLoading(false);
   };
 
   return (

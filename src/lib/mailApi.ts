@@ -1,7 +1,8 @@
 const BACKEND_URLS = {
   auth: 'https://functions.poehali.dev/2182b778-07ed-4c04-be40-74ce2b698cec',
   fetch: 'https://functions.poehali.dev/cad18501-411c-4ba4-a229-62016362649d',
-  send: 'https://functions.poehali.dev/5f6f1f4b-75e1-459f-b8cf-b6ad274edb61'
+  send: 'https://functions.poehali.dev/5f6f1f4b-75e1-459f-b8cf-b6ad274edb61',
+  register: 'https://functions.poehali.dev/c513198c-9804-48b0-b7e2-47f36245bb09'
 };
 
 export interface EmailCredentials {
@@ -21,7 +22,30 @@ export interface Email {
   content: string;
 }
 
+export interface RegisterData {
+  email: string;
+  password: string;
+  fullName: string;
+}
+
 export const mailApi = {
+  async register(data: RegisterData): Promise<{ success: boolean; error?: string; email?: string }> {
+    try {
+      const response = await fetch(BACKEND_URLS.register, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      return { success: false, error: 'Connection error' };
+    }
+  },
+
   async authenticate(credentials: EmailCredentials): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await fetch(BACKEND_URLS.auth, {

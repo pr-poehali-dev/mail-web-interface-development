@@ -1,0 +1,50 @@
+{
+  "tests": [
+    {
+      "name": "Test successful registration",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "email": "testuser@nargizamail.ru",
+        "password": "test123456",
+        "fullName": "Test User"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "email": "testuser@nargizamail.ru"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test short password",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "email": "test@nargizamail.ru",
+        "password": "123",
+        "fullName": "Test"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test invalid domain",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "email": "test@gmail.com",
+        "password": "test123456",
+        "fullName": "Test"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
