@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
+import Login from './Login';
 
 interface Email {
   id: number;
@@ -88,9 +89,31 @@ const folders = [
 ];
 
 const Index = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('inbox');
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(mockEmails[0]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const authToken = localStorage.getItem('nargizamail_auth');
+    if (authToken) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (credentials: { email: string; password: string }) => {
+    localStorage.setItem('nargizamail_auth', JSON.stringify(credentials));
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('nargizamail_auth');
+    setIsAuthenticated(false);
+  };
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <div className="h-screen w-full flex overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
@@ -106,9 +129,18 @@ const Index = () => {
             </h1>
           </div>
           
-          <Button className="w-full mb-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-200 transition-all hover:shadow-xl hover:scale-105">
+          <Button className="w-full mb-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-200 transition-all hover:shadow-xl hover:scale-105">
             <Icon name="Plus" size={18} className="mr-2" />
             Написать письмо
+          </Button>
+          
+          <Button 
+            onClick={handleLogout}
+            variant="outline" 
+            className="w-full border-purple-200 text-purple-600 hover:bg-purple-50"
+          >
+            <Icon name="LogOut" size={18} className="mr-2" />
+            Выйти
           </Button>
         </div>
 
