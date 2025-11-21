@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "Test get all accounts",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "accounts": []
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test create account",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "email": "test@nargizamail.ru",
+        "password": "test123",
+        "fullName": "Test User",
+        "quotaMb": 1024
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
